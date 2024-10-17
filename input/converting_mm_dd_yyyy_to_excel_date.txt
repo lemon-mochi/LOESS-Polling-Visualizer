@@ -1,0 +1,20 @@
+
+Based on the alignment of the dates, it appears they may be formatted as text. This is usually happens to me when copying and pasting.
+
+Try this:
+
+Highlight the dates giving you issues. (Not the formulas)
+
+Go to the Data tab
+
+Click on Text to columns
+
+Keep it on delimited, then next
+
+uncheck all delimiters, then next
+
+choose date or general, and finish
+
+This should force the formatting as numbers. Let me know if this helps!
+
+Taken from https://www.reddit.com/r/excel/comments/wcbl49/excel_not_recognising_date_format/
