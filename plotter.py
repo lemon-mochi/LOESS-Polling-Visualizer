@@ -34,7 +34,6 @@ def generate_random_colour(given_colours):
     else:
         return colour
 
-
 def main():
     filename1 = sys.argv[1]
     poll_data = pd.read_csv(filename1, sep=',', header=0, index_col=0)
@@ -42,16 +41,36 @@ def main():
     
     poll_data = poll_data.sort_index()
     parties = list(poll_data)
+
+    # find the length of the dataframe to determine what the frac should be
+    # and the size of the horizontal on the matplotlib
+    number_of_rows = len(poll_data.index)
+    if (number_of_rows <= 40): # very small dataset
+        frac=0.35
+        x=9
+        y=5
+    elif (number_of_rows <= 100): # fairly small dataset
+        frac=0.175
+        x=12
+        y=7
+    elif (number_of_rows <= 200): # pretty big dataset
+        frac=0.1
+        x=16
+        y=10
+    else: # very big dataset
+        frac=0.075
+        x=20
+        y=13
+
     
     for party in parties:
         # Convert non-numeric values to 0
         poll_data[party] = pd.to_numeric(poll_data[party], errors='coerce').fillna(0)
-        print(poll_data[party])
 
         loess_smoothed[party] = sm.nonparametric.lowess(
             poll_data[party],
             poll_data.index,
-            frac=0.175,
+            frac=frac,
             delta=0.0,
             is_sorted=True,
             missing='drop',
@@ -70,8 +89,6 @@ def main():
             colours.append(generate_random_colour(colours))
         j += 1
 
-    plt.figure(figsize=(12, 5))
-
     # generate colours for parties/candidates which were not given a colour in the command line
     while ((j-2) < len(parties)):
         colours.append(generate_random_colour(colours))
@@ -81,6 +98,7 @@ def main():
     poll_data['timestamp'] = pd.to_datetime(poll_data.index, origin='1899-12-30', unit='D')
 
     i = 0
+    plt.figure(figsize=(x, y))
 
     # Plot each party with its corresponding colour
     for party in parties:
@@ -103,7 +121,8 @@ def main():
 
     plt.xlabel('Date')
     plt.ylabel('Polling Data')
-    plt.legend()
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+          fancybox=True, shadow=True, ncol=len(parties))
     plt.title('Polling Data with LOWESS Smoothing')
 
     # find out whether the input came from the input directory
